@@ -1,0 +1,11 @@
+# Ignore Unity-specific files
+.vs/
+.idea/
+.vscode/
+Library/
+Temp/
+Obj/
+Build/
+UserSettings/
+.DS_Store
+ 
