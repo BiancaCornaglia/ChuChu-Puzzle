@@ -9,6 +9,15 @@ EditorBuildSettings:
     path: "Assets/Scenes/Men\xFA.unity"
     guid: eafa0b59095fb184598da3b38c7623a6
   - enabled: 1
-    path: Assets/Scenes/SampleScene.unity
+    path: Assets/Scenes/SelectorNiveles.unity
+    guid: 65f496d4dd3f896419218d3e520bd719
+  - enabled: 1
+    path: Assets/Scenes/Nivel 1.unity
+    guid: 2f2795aa02d79b04189156be565a60e6
+  - enabled: 1
+    path: Assets/Scenes/Nivel 2.unity
+    guid: 5de2b9c138ecb7046b396b1d2f66e134
+  - enabled: 1
+    path: Assets/Scenes/Juego.unity
     guid: 2cda990e2423bbf4892e6590ba056729
   m_configObjects: {}
