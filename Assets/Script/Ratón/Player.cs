@@ -6,6 +6,8 @@ using UnityEngine;
 
 public class Player : MonoBehaviour
 {
+    public GameObject collisionCheck;
+    
     [SerializeField]
     float speed;
 
@@ -15,17 +17,13 @@ public class Player : MonoBehaviour
     [SerializeField]
     float initialSpeedY;
 
-    [SerializeField]
-    bool derecha = false;
+    public bool derecha = false;
 
-    [SerializeField]
-    bool izquierda = false;
+    public bool izquierda = false;
 
-    [SerializeField]
-    bool arriba = false;
+    public bool arriba = false;
 
-    [SerializeField]
-    bool abajo = false;
+    public bool abajo = false;
     void Start()
     {
         if (initialSpeedX > 0)
@@ -44,7 +42,6 @@ public class Player : MonoBehaviour
         {
             abajo = true;
         }
-
     }
 
     void Update()
@@ -55,6 +52,7 @@ public class Player : MonoBehaviour
             izquierda = false;
             arriba = false;
             abajo = false;
+            collisionCheck.GetComponent<Transform>().localPosition = new Vector2(0.5f, 0);
         }
         if (izquierda == true)
         {
@@ -62,6 +60,7 @@ public class Player : MonoBehaviour
             derecha = false;
             arriba = false;
             abajo = false;
+            collisionCheck.GetComponent<Transform>().localPosition = new Vector2(-0.5f, 0);
         }
         if (arriba == true)
         {
@@ -69,6 +68,7 @@ public class Player : MonoBehaviour
             derecha = false;
             izquierda = false;
             abajo = false;
+            collisionCheck.GetComponent<Transform>().localPosition = new Vector2(0, 0.5f);
         }
         if (abajo == true)
         {
@@ -76,35 +76,9 @@ public class Player : MonoBehaviour
             derecha = false;
             izquierda = false;
             arriba = false;
+            collisionCheck.GetComponent<Transform>().localPosition = new Vector2(0, -0.5f);
         }
 
-    }
-
-    void OnCollisionEnter2D(Collision2D other)
-    {
-        if (other.gameObject.tag == "Borde")
-        {
-            if (derecha == true)
-            {
-                abajo = true;
-                derecha = false;
-            }
-            if (izquierda == true)
-            {
-                arriba = true;
-                izquierda = false;
-            }
-            if (arriba == true)
-            {
-                derecha = true;
-                arriba = false;
-            }
-            if (abajo == true)
-            {
-                izquierda = true;
-                abajo = false;
-            }
-        }
     }
 
 }
