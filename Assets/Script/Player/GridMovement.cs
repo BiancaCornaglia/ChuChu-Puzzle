@@ -1,75 +1,71 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
-
 public class GridMovement : MonoBehaviour
 {
-    void Start()
-{
-    Vector3Int cellPos = tilemap.WorldToCell(transform.position);
-    transform.position = tilemap.GetCellCenterWorld(cellPos);
-    targetPosition = transform.position;
-}
-    [SerializeField] private Tilemap tilemap;
+    [Header("Tilemap de movimiento")]
+    [SerializeField] private Tilemap tilemap;       // Tilemap de suelo (movible)
+
+    [Header("Movimiento")]
     [SerializeField] private float moveTime = 0.15f;
-    private Vector2 targetPosition;
-    private float xInput, yInput;
+
+    private Vector3Int currentCell;
+    private Vector3 targetPosition;
     private bool isMoving;
+
+    void Start()
+    {
+        // Alineamos la posición del objeto al centro de la celda
+        currentCell = tilemap.WorldToCell(transform.position);
+        currentCell = tilemap.WorldToCell(tilemap.GetCellCenterWorld(currentCell));
+        transform.position = tilemap.GetCellCenterWorld(currentCell);
+        targetPosition = transform.position;
+    }
+
     void Update()
     {
-        xInput = Input.GetAxisRaw("Horizontal");
-        yInput = Input.GetAxisRaw("Vertical");
+        if (isMoving) return;
 
-        if ((xInput != 0f || yInput != 0f) && !isMoving && Input.anyKeyDown)
+        Vector3Int direction = GetInputDirection();
+
+        if (direction != Vector3Int.zero)
         {
-            CalculateTargetPosition();
-            StartCoroutine(Move());
+            Vector3Int newCell = currentCell + direction;
+
+            // Solo se mueve si el nuevo tile existe en el tilemap de movimiento
+            if (tilemap.HasTile(newCell))
+            {
+                currentCell = newCell;
+                targetPosition = tilemap.GetCellCenterWorld(currentCell);
+                StartCoroutine(Move());
+            }
         }
+    }
+
+    private Vector3Int GetInputDirection()
+    {
+        if (Input.GetKeyDown(KeyCode.RightArrow)) return Vector3Int.right;
+        if (Input.GetKeyDown(KeyCode.LeftArrow)) return Vector3Int.left;
+        if (Input.GetKeyDown(KeyCode.UpArrow)) return Vector3Int.up;
+        if (Input.GetKeyDown(KeyCode.DownArrow)) return Vector3Int.down;
+        return Vector3Int.zero;
     }
 
     IEnumerator Move()
     {
         isMoving = true;
-        float timeElapsed = 0f;
-        Vector2 startposition = transform.position;
+        Vector3 startPos = transform.position;
+        float elapsed = 0f;
 
-        while (timeElapsed < moveTime)
+        while (elapsed < moveTime)
         {
-            transform.position = Vector2.Lerp(startposition, targetPosition, timeElapsed / moveTime);
-            timeElapsed += Time.deltaTime;
+            transform.position = Vector3.Lerp(startPos, targetPosition, elapsed / moveTime);
+            elapsed += Time.deltaTime;
             yield return null;
         }
+
         transform.position = targetPosition;
         isMoving = false;
-
     }
-    private void CalculateTargetPosition()
-{
-    Vector2 direction = Vector2.zero;
-
-    if (xInput == 1f) direction = Vector2.right;
-    else if (xInput == -1f) direction = Vector2.left;
-    else if (yInput == 1f) direction = Vector2.up;
-    else if (yInput == -1f) direction = Vector2.down;
-
-    Vector3 potentialPosition = transform.position + (Vector3)direction;
-
-    // Convertimos a coordenadas de celda
-    Vector3Int cellPosition = tilemap.WorldToCell(potentialPosition);
-
-    // Verificamos si está dentro de los límites del tilemap y si hay tile
-    if (tilemap.HasTile(cellPosition))
-    {
-        // Convertimos de nuevo a coordenadas centradas en la celda
-        targetPosition = tilemap.GetCellCenterWorld(cellPosition);
-    }
-    else
-    {
-        // No hay movimiento válido
-        targetPosition = transform.position;
-    }
-}
-
 }
