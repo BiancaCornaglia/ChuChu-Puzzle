@@ -5,6 +5,7 @@ TagManager:
   serializedVersion: 2
   tags:
   - Borde
+  - Rat
   layers:
   - Default
   - TransparentFX
