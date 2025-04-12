@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Borde
   - Rat
+  - Rocket
   layers:
   - Default
   - TransparentFX
@@ -13,7 +14,7 @@ TagManager:
   - Borde
   - Water
   - UI
-  - 
+  - Flecha
   - 
   - 
   - 
