@@ -11,6 +11,7 @@ public class ArrowPlacer : MonoBehaviour
 
     void Update()
     {
+        if (GameManager.Instance.IsPaused) return;
         // Obtenemos la celda en la que está parado el puntero
         currentCell = arrowTilemap.WorldToCell(transform.position);
 

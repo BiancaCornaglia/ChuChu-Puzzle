@@ -7,6 +7,7 @@ TagManager:
   - Borde
   - Rat
   - Rocket
+  - Cat
   layers:
   - Default
   - TransparentFX

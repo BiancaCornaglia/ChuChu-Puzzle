@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
-public class RatMovement : MonoBehaviour
+public class CatMovement : MonoBehaviour
 {
     [Header("Tilemaps")]
     [SerializeField] private Tilemap groundTilemap;
@@ -19,7 +19,6 @@ public class RatMovement : MonoBehaviour
     private Vector3Int currentCell;
     private Vector3 targetPos;
     private bool isMoving = false;
-
     private Vector3Int currentDirection = Vector3Int.right;
 
     void Start()
@@ -28,14 +27,15 @@ public class RatMovement : MonoBehaviour
         transform.position = groundTilemap.GetCellCenterWorld(currentCell);
         targetPos = transform.position;
         currentDirection = initialDirection;
-        GameManager.Instance.RegisterRat();
     }
 
     void Update()
     {
+        if (!GameManager.Instance.SimulationStarted || GameManager.Instance.IsPaused)
+            return;
+
         if (!isMoving)
         {
-            // Calcula la siguiente celda en la dirección actual
             Vector3Int nextCell = currentCell + currentDirection;
 
             if (CanMoveTo(nextCell))
@@ -44,7 +44,6 @@ public class RatMovement : MonoBehaviour
             }
             else
             {
-                // Intenta rotar a la derecha
                 Vector3Int rightDir = RotateRight(currentDirection);
                 Vector3Int rightCell = currentCell + rightDir;
 
@@ -55,7 +54,6 @@ public class RatMovement : MonoBehaviour
                 }
                 else
                 {
-                    // Intenta rotar a la izquierda
                     Vector3Int leftDir = RotateLeft(currentDirection);
                     Vector3Int leftCell = currentCell + leftDir;
 
@@ -64,8 +62,6 @@ public class RatMovement : MonoBehaviour
                         currentDirection = leftDir;
                         MoveTo(leftCell);
                     }
-
-                    // Si no puede, se queda quieto
                 }
             }
         }
@@ -94,7 +90,6 @@ public class RatMovement : MonoBehaviour
         transform.position = targetPos;
         isMoving = false;
 
-        // ✅ Leer la flecha solo después de llegar a la celda
         CheckArrowTile();
     }
 
@@ -104,8 +99,6 @@ public class RatMovement : MonoBehaviour
         TileBase arrowTile = arrowTilemap.GetTile(cell);
 
         if (arrowTile == null) return;
-
-        Debug.Log("Arrow Tile found: " + arrowTile.name);
 
         string tileName = arrowTile.name.ToLower();
 
@@ -154,13 +147,14 @@ public class RatMovement : MonoBehaviour
         if (dir == Vector3Int.right) return Vector3Int.up;
         return dir;
     }
-    void OnTriggerEnter2D(Collider2D other)
-    {
-    if (other.CompareTag("Rocket"))
-    {
-        GameManager.Instance.RatReachedRocket();
-        gameObject.SetActive(false); // 👈 El ratón desaparece
-    }
-}
 
+    private void OnTriggerEnter2D(Collider2D other)
+    {
+        if (other.CompareTag("Rat"))
+        {
+            // ¡El gato se comió al ratón!
+            Debug.Log("¡El gato atrapó a un ratón! Reiniciando...");
+            GameManager.Instance.RestartLevel();
+        }
+    }
 }
