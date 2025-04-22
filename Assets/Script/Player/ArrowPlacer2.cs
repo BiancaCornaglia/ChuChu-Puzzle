@@ -11,6 +11,7 @@ public class ArrowPlacer2 : MonoBehaviour
 
     void Update()
     {
+
         if (GameManager.Instance.IsPaused) return;
         
         currentCell = arrowTilemap.WorldToCell(transform.position);
@@ -22,6 +23,7 @@ public class ArrowPlacer2 : MonoBehaviour
 
             arrowTilemap.SetTile(currentCell, arrowUpTile);
             arrowInventory.UseArrow();
+            SoundManager.Instance.PlaySound(SoundManager.Instance.placeArrowClip);
         }
     }
 }

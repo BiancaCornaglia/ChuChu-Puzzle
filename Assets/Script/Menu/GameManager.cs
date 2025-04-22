@@ -80,6 +80,8 @@ public void SetPaused(bool value)
     yield return new WaitForSeconds(1.5f);
 
     stageClearedImage.SetActive(true);
+    SoundManager.Instance.PlaySound(SoundManager.Instance.stageClearClip);
+
 
         yield return new WaitForSeconds(2f);
 

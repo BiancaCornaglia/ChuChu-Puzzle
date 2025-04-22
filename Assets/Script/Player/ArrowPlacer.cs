@@ -9,8 +9,10 @@ public class ArrowPlacer : MonoBehaviour
 
     private Vector3Int currentCell;
 
+    
     void Update()
     {
+
         if (GameManager.Instance.IsPaused) return;
         // Obtenemos la celda en la que está parado el puntero
         currentCell = arrowTilemap.WorldToCell(transform.position);
@@ -25,6 +27,7 @@ public class ArrowPlacer : MonoBehaviour
             // Colocamos la flecha en la celda actual
             arrowTilemap.SetTile(currentCell, arrowLeftTile);
             arrowInventory.UseArrow();
+            SoundManager.Instance.PlaySound(SoundManager.Instance.placeArrowClip);
         }
     }
 }

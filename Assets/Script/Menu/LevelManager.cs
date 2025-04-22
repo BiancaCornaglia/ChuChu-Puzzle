@@ -10,6 +10,7 @@ public class LevelManager : MonoBehaviour
     void Start()
     {
         StartCoroutine(ShowStageIntro());
+        SoundManager.Instance.PlaySound(SoundManager.Instance.startSimClip);
     }
 
     private IEnumerator ShowStageIntro()

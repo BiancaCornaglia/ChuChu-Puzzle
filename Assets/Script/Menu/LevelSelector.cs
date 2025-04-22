@@ -28,18 +28,22 @@ public class LevelSelector : MonoBehaviour
             UpdateDisplay();
         }
 
-        if (Input.GetKeyDown(KeyCode.Return))
+        if (Input.GetKeyDown(KeyCode.Escape))
         {
-            if (selectedLevel == 0)
+            SceneManager.LoadScene("MenuScene");
+        }
+            if (Input.GetKeyDown(KeyCode.Return))
             {
-                SceneManager.LoadScene("Level1Scene");
-            }
-            else
-            {
-                SceneManager.LoadScene("Level2Scene");
+                if (selectedLevel == 0)
+                {
+                    SceneManager.LoadScene("Level1Scene");
+                }
+                else
+                {
+                    SceneManager.LoadScene("Level2Scene");
+                }
             }
         }
-    }
 
     void UpdateDisplay()
     {

@@ -212,6 +212,7 @@ else if (tileName.Contains("down"))
     {
         if (other.CompareTag("Rocket"))
         {
+            SoundManager.Instance.PlaySound(SoundManager.Instance.ratArriveClip);
             GameManager.Instance.RatReachedRocket();
             gameObject.SetActive(false); // 👈 El ratón desaparece
         }
