@@ -9,14 +9,19 @@ public class GameManager : MonoBehaviour
     public static GameManager Instance;
 
     [Header("UI")]
+    [SerializeField] private RocketAnimatorTrigger rocketAnimator;
     [SerializeField] private GameObject stageClearedImage; // ← imagen "Stage 01 Cleared"
+    private RocketAnimatorTrigger[] allRockets;
 
+    public GameObject pointerObject;
+private bool gameStarted = false;
     private int totalRats = 0;
     private int ratsArrived = 0;
     public bool SimulationStarted { get; private set; }
     void Start()
 {
-    // Ocultar la imagen de "Stage Cleared" al inicio
+        // Ocultar la imagen de "Stage Cleared" al inicio
+    allRockets = FindObjectsOfType<RocketAnimatorTrigger>(); // 🚀 encuentra todos en la escena
     stageClearedImage.SetActive(false);
 }
 public bool IsPaused { get; private set; } = false;
@@ -57,24 +62,30 @@ public void SetPaused(bool value)
     public void RatReachedRocket()
     {
         ratsArrived++;
+        foreach (var rocket in allRockets)
+        rocket.TriggerBounce();
 
         if (ratsArrived >= totalRats)
         {
             Debug.Log("¡Ganaste!");
-            StartCoroutine(ShowStageCleared());
+            StartCoroutine(LaunchSequence());
         }
     }
 
-    private IEnumerator ShowStageCleared()
+    private IEnumerator LaunchSequence()
     {
-        stageClearedImage.SetActive(true);
+    foreach (var rocket in allRockets)
+        rocket.TriggerLaunch();
+
+    yield return new WaitForSeconds(1.5f);
+
+    stageClearedImage.SetActive(true);
 
         yield return new WaitForSeconds(2f);
 
         // Habilita la espera de entrada del jugador
         waitingForInputAfterWin = true;
 
-        Debug.Log("Presiona ENTER para continuar o ESC para volver al selector de niveles");
     }
 void Update()
 {
@@ -87,8 +98,15 @@ void Update()
     // Solo iniciar simulación si aún no empezó
     if (!SimulationStarted && !waitingForInputAfterWin)
     {
-        if (Input.GetKeyDown(KeyCode.Space))
+        if (!gameStarted && Input.GetKeyDown(KeyCode.Space))
         {
+            gameStarted = true;
+
+            if (pointerObject != null)
+            {
+                pointerObject.SetActive(false); // O desactivá su script si solo querés bloquearlo
+            }
+
             StartSimulation();
         }
     }
@@ -113,7 +131,5 @@ public void RestartLevel()
     string currentScene = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
     UnityEngine.SceneManagement.SceneManager.LoadScene(currentScene);
 }
-
-
 
 }

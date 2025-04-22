@@ -16,6 +16,7 @@ public class RatMovement : MonoBehaviour
     [Header("Dirección Inicial")]
     [SerializeField] private Vector3Int initialDirection = Vector3Int.right;
 
+
     private Vector3Int currentCell;
     private Vector3 targetPos;
     private bool isMoving = false;
