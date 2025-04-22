@@ -20,9 +20,14 @@ public class RatMovement : MonoBehaviour
     private Vector3 targetPos;
     private bool isMoving = false;
     private Vector3Int currentDirection = Vector3Int.right;
+    private Animator animator;
+    private SpriteRenderer spriteRenderer;
+
 
     void Start()
     {
+        animator = GetComponent<Animator>();
+        spriteRenderer = GetComponent<SpriteRenderer>();
         currentCell = groundTilemap.WorldToCell(transform.position);
         transform.position = groundTilemap.GetCellCenterWorld(currentCell);
         targetPos = transform.position;
@@ -66,11 +71,51 @@ public class RatMovement : MonoBehaviour
             }
         }
     }
+    void UpdateAnimation()
+{
+    if (currentDirection == Vector3Int.up)
+    {
+        animator.Play("Melo_animation_walk_03");
+        spriteRenderer.flipX = false;
+    }
+    else if (currentDirection == Vector3Int.down)
+    {
+        animator.Play("Melo_animation_walk_01");
+        spriteRenderer.flipX = false;
+    }
+    else if (currentDirection == Vector3Int.right)
+    {
+        animator.Play("Melo_animation_walk_02");
+        spriteRenderer.flipX = false; // derecha
+    }
+    else if (currentDirection == Vector3Int.left)
+    {
+        animator.Play("Melo_animation_walk_02");
+        spriteRenderer.flipX = true; // izquierda
+    }
+}
+
+    void SetAnimationDirection(Vector3Int dir)
+{
+    if (dir == Vector3Int.up)
+        animator.Play("Melo_animation_walk_03");
+    else if (dir == Vector3Int.down)
+        animator.Play("Melo_animation_walk_01");
+    else if (dir == Vector3Int.left || dir == Vector3Int.right)
+    {
+        animator.Play("Melo_animation_walk_02");
+
+        // Si va a la izquierda, espejamos el sprite horizontalmente
+        spriteRenderer.flipX = dir == Vector3Int.left;
+    }
+}
+
 
     void MoveTo(Vector3Int newCell)
     {
         currentCell = newCell;
         targetPos = groundTilemap.GetCellCenterWorld(currentCell);
+        SetAnimationDirection(currentDirection);
         StartCoroutine(Move());
     }
 
@@ -103,15 +148,26 @@ public class RatMovement : MonoBehaviour
         Debug.Log("Arrow Tile found: " + arrowTile.name);
 
         string tileName = arrowTile.name.ToLower();
-
-        if (tileName.Contains("left"))
-            currentDirection = Vector3Int.left;
-        else if (tileName.Contains("right"))
-            currentDirection = Vector3Int.right;
-        else if (tileName.Contains("up"))
-            currentDirection = Vector3Int.up;
-        else if (tileName.Contains("down"))
-            currentDirection = Vector3Int.down;
+if (tileName.Contains("left"))
+{
+    currentDirection = Vector3Int.left;
+    UpdateAnimation();
+}
+else if (tileName.Contains("right"))
+{
+    currentDirection = Vector3Int.right;
+    UpdateAnimation();
+}
+else if (tileName.Contains("up"))
+{
+    currentDirection = Vector3Int.up;
+    UpdateAnimation();
+}
+else if (tileName.Contains("down"))
+{
+    currentDirection = Vector3Int.down;
+    UpdateAnimation();
+}
     }
 
     bool CanMoveTo(Vector3Int cell)
