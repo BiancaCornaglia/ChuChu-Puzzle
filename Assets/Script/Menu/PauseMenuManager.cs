@@ -8,63 +8,89 @@ public class PauseMenuManager : MonoBehaviour
     public GameObject quitImage;
 
     private bool isPaused = false;
-    private int currentSelection = 0; // 0 = resume, 1 = quit
-    void Start()
-{
-    if (SceneManager.GetActiveScene().name == "MainMenu")
-    {
-        gameObject.SetActive(false);
-    }
-}
+    private int currentSelection = 0; // 0 = Resume, 1 = Quit
 
-void Update()
-{
-    // No permitir pausar si ya ganaste
-    if (GameManager.Instance.SimulationStarted || !GameManager.Instance.SimulationStarted)
+    private readonly float moveCooldown = 0.2f;
+    private float moveTimer = 0f;
+    private bool readyToMove = true;
+
+    void Start()
     {
-        if (Input.GetKeyDown(KeyCode.Escape))
+        if (SceneManager.GetActiveScene().name == "MainMenu")
+        {
+            gameObject.SetActive(false);
+        }
+    }
+
+    void Update()
+    {
+        if (InputManager.PausePressed())
         {
             if (!isPaused)
                 PauseGame();
             else
                 ResumeGame();
         }
+
+        if (isPaused)
+        {
+            HandleMenuNavigation();
+        }
     }
 
-    if (isPaused)
+    void PauseGame()
     {
-        HandleMenuNavigation();
+        isPaused = true;
+        GameManager.Instance?.SetPaused(true);
+        pausePanel.SetActive(true);
+        ShowSelection();
     }
-}
-void PauseGame()
-{
-    isPaused = true;
-    GameManager.Instance.SetPaused(true); // ⬅️ importante
-    pausePanel.SetActive(true);
-    ShowSelection();
-}
 
-void ResumeGame()
-{
-    isPaused = false;
-    GameManager.Instance.SetPaused(false); // ⬅️ importante
-    pausePanel.SetActive(false);
-}
+    void ResumeGame()
+    {
+        isPaused = false;
+        GameManager.Instance?.SetPaused(false);
+        pausePanel.SetActive(false);
+    }
 
     void HandleMenuNavigation()
     {
-        if (Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.LeftArrow))
+        moveTimer -= Time.unscaledDeltaTime; // ⏱️ usamos tiempo pausado
+        float horizontalInput = Input.GetAxisRaw("Horizontal");
+
+        if (Mathf.Abs(horizontalInput) < 0.2f)
         {
-            currentSelection = 1 - currentSelection; // Alterna entre 0 y 1
-            ShowSelection();
+            readyToMove = true;
         }
 
-        if (Input.GetKeyDown(KeyCode.Return))
+        if (moveTimer <= 0f && readyToMove)
+        {
+            if (horizontalInput > 0.5f)
+            {
+                currentSelection = 1;
+                ShowSelection();
+                moveTimer = moveCooldown;
+                readyToMove = false;
+            }
+            else if (horizontalInput < -0.5f)
+            {
+                currentSelection = 0;
+                ShowSelection();
+                moveTimer = moveCooldown;
+                readyToMove = false;
+            }
+        }
+
+        if (InputManager.ConfirmPressed()) // 🔥 Usamos el nuevo ConfirmPressed
         {
             if (currentSelection == 0)
+            {
                 ResumeGame();
+            }
             else
+            {
                 QuitToMenu();
+            }
         }
     }
 
@@ -76,7 +102,7 @@ void ResumeGame()
 
     void QuitToMenu()
     {
-        Time.timeScale = 1f; // Muy importante para despausar antes de cargar escena
+        Time.timeScale = 1f; // 🔥 Siempre reseteamos la velocidad del tiempo
         SceneManager.LoadScene("MenuScene");
     }
 }

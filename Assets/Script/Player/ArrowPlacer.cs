@@ -17,7 +17,7 @@ public class ArrowPlacer : MonoBehaviour
         // Obtenemos la celda en la que está parado el puntero
         currentCell = arrowTilemap.WorldToCell(transform.position);
 
-        if (Input.GetKeyDown(KeyCode.Return))
+        if (Input.GetKeyDown(KeyCode.Return)|| Input.GetKeyDown(KeyCode.JoystickButton1))
         {
             if (!arrowInventory.HasArrows()) return;
 

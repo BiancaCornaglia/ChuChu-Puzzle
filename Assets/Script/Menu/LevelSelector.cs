@@ -10,29 +10,42 @@ public class LevelSelector : MonoBehaviour
 
     private int selectedLevel = 0;
 
-    void Start()
-    {
-        UpdateDisplay();
-    }
+//    void Start()
+ //   {
+  //      UpdateDisplay();
+   // }
 
-    void Update()
+private readonly float moveCooldown = 0.2f; // Para que no se mueva demasiado rápido
+private float moveTimer = 0f;
+
+void Update()
+{
+    moveTimer -= Time.deltaTime;
+
+    float horizontalInput = Input.GetAxisRaw("Horizontal"); // Teclado y Joystick usan esto
+
+    if (moveTimer <= 0f)
     {
-        if (Input.GetKeyDown(KeyCode.RightArrow))
+        if (horizontalInput > 0.5f)
         {
             selectedLevel = 1;
             UpdateDisplay();
+            moveTimer = moveCooldown;
         }
-        else if (Input.GetKeyDown(KeyCode.LeftArrow))
+        
+        else if (horizontalInput < -0.5f)
         {
             selectedLevel = 0;
             UpdateDisplay();
+            moveTimer = moveCooldown;
         }
+    }
 
-        if (Input.GetKeyDown(KeyCode.Escape))
+        if (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.JoystickButton2))
         {
             SceneManager.LoadScene("MenuScene");
         }
-            if (Input.GetKeyDown(KeyCode.Return))
+            if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.JoystickButton1))
             {
                 if (selectedLevel == 0)
                 {

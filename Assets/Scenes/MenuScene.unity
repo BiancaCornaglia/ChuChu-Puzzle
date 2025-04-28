@@ -603,6 +603,8 @@ MonoBehaviour:
   frames:
   - {fileID: 21300000, guid: e165dc352d5f86b44b5e4891dc6285be, type: 3}
   - {fileID: 21300000, guid: b5998fd13ccbb904283bfad6b02591cd, type: 3}
+  - {fileID: 21300000, guid: e165dc352d5f86b44b5e4891dc6285be, type: 3}
+  - {fileID: 21300000, guid: 963190fb4d940a34e85774a42058a3c6, type: 3}
   frameRate: 0.5
 --- !u!1660057539 &9223372036854775807
 SceneRoots:

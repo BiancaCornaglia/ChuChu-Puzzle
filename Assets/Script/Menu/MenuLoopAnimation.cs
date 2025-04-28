@@ -30,7 +30,7 @@ public class MenuLoopAnimation : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Return))
+        if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.JoystickButton1) || Input.GetKeyDown(KeyCode.JoystickButton9))
         {
             isPlaying = false;
             SceneManager.LoadScene("LevelSelectScene");

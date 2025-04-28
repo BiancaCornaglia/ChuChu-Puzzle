@@ -1,37 +1,48 @@
 using System.Collections;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
     [SerializeField] private string nextLevelSceneName = "Stage02";
     [SerializeField] private string levelSelectSceneName = "LevelSelect";
-    private bool waitingForInputAfterWin = false;  
+    private bool waitingForInputAfterWin = false;
     public static GameManager Instance;
 
     [Header("UI")]
     [SerializeField] private RocketAnimatorTrigger rocketAnimator;
-    [SerializeField] private GameObject stageClearedImage; // ← imagen "Stage 01 Cleared"
+    [SerializeField] private GameObject stageClearedImage;
     private RocketAnimatorTrigger[] allRockets;
 
     public GameObject pointerObject;
-private bool gameStarted = false;
+    private bool gameStarted = false;
     private int totalRats = 0;
     private int ratsArrived = 0;
+
     public bool SimulationStarted { get; private set; }
-    void Start()
-{
-        // Ocultar la imagen de "Stage Cleared" al inicio
-    allRockets = FindObjectsOfType<RocketAnimatorTrigger>(); // 🚀 encuentra todos en la escena
-    stageClearedImage.SetActive(false);
-}
-public bool IsPaused { get; private set; } = false;
+    public bool IsPaused { get; private set; } = false;
+    public bool WaitingForInputAfterWin => waitingForInputAfterWin; // 👈 para InputManager
 
-public void SetPaused(bool value)
-{
-    IsPaused = value;
-    Time.timeScale = value ? 0f : 1f;
-}
+    private void Awake()
+    {
+        if (Instance == null)
+            Instance = this;
+        else
+            Destroy(gameObject);
 
+        stageClearedImage.SetActive(false);
+    }
+
+    private void Start()
+    {
+        allRockets = FindObjectsOfType<RocketAnimatorTrigger>();
+    }
+
+    public void SetPaused(bool value)
+    {
+        IsPaused = value;
+        Time.timeScale = value ? 0f : 1f;
+    }
 
     public void StartSimulation()
     {
@@ -45,15 +56,6 @@ public void SetPaused(bool value)
         totalRats = 0;
     }
 
-    private void Awake()
-    {
-            stageClearedImage.SetActive(false);
-        if (Instance == null)
-            Instance = this;
-        else
-            Destroy(gameObject);
-    }
-
     public void RegisterRat()
     {
         totalRats++;
@@ -63,7 +65,7 @@ public void SetPaused(bool value)
     {
         ratsArrived++;
         foreach (var rocket in allRockets)
-        rocket.TriggerBounce();
+            rocket.TriggerBounce();
 
         if (ratsArrived >= totalRats)
         {
@@ -74,64 +76,55 @@ public void SetPaused(bool value)
 
     private IEnumerator LaunchSequence()
     {
-    foreach (var rocket in allRockets)
-        rocket.TriggerLaunch();
+        foreach (var rocket in allRockets)
+            rocket.TriggerLaunch();
 
-    yield return new WaitForSeconds(1.5f);
+        yield return new WaitForSeconds(1.5f);
 
-    stageClearedImage.SetActive(true);
-    SoundManager.Instance.PlaySound(SoundManager.Instance.stageClearClip);
-
+        stageClearedImage.SetActive(true);
+        SoundManager.Instance.PlaySound(SoundManager.Instance.stageClearClip);
 
         yield return new WaitForSeconds(2f);
-
-        // Habilita la espera de entrada del jugador
         waitingForInputAfterWin = true;
-
-    }
-void Update()
-{
-    // Reinicio del nivel: puede hacerse en cualquier momento, excepto si ya ganaste
-    if (!waitingForInputAfterWin && Input.GetKeyDown(KeyCode.A))
-    {
-        RestartLevel();
     }
 
-    // Solo iniciar simulación si aún no empezó
-    if (!SimulationStarted && !waitingForInputAfterWin)
+    private void Update()
     {
-        if (!gameStarted && Input.GetKeyDown(KeyCode.Space))
+        if (!waitingForInputAfterWin && Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.JoystickButton3))
         {
-            gameStarted = true;
+            RestartLevel();
+        }
 
-            if (pointerObject != null)
+        if (!SimulationStarted && !waitingForInputAfterWin && !IsPaused)
+        {
+            if (!gameStarted && InputManager.StartSimulationPressed())
             {
-                pointerObject.SetActive(false); // O desactivá su script si solo querés bloquearlo
+                gameStarted = true;
+
+                if (pointerObject != null)
+                {
+                    pointerObject.SetActive(false);
+                }
+
+                StartSimulation();
             }
+        }
 
-            StartSimulation();
+        if (waitingForInputAfterWin)
+        {
+            if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.JoystickButton1))
+            {
+                SceneManager.LoadScene("Level2Scene");
+            }
+            else if (InputManager.CancelPressed())
+            {
+                SceneManager.LoadScene("LevelSelectScene");
+            }
         }
     }
 
-    // Esperando decisión post-victoria
-    if (waitingForInputAfterWin)
+    public void RestartLevel()
     {
-        if (Input.GetKeyDown(KeyCode.Return)) // ENTER
-        {
-            UnityEngine.SceneManagement.SceneManager.LoadScene(nextLevelSceneName);
-        }
-        else if (Input.GetKeyDown(KeyCode.Escape)) // ESC
-        {
-            UnityEngine.SceneManagement.SceneManager.LoadScene(levelSelectSceneName);
-        }
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
-}
-
-
-public void RestartLevel()
-{
-    string currentScene = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
-    UnityEngine.SceneManagement.SceneManager.LoadScene(currentScene);
-}
-
 }

@@ -16,7 +16,7 @@ public class ArrowPlacer2 : MonoBehaviour
         
         currentCell = arrowTilemap.WorldToCell(transform.position);
 
-        if (Input.GetKeyDown(KeyCode.Return))
+        if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.JoystickButton1))
         {
             if (!arrowInventory.HasArrow()) return;
             if (arrowTilemap.HasTile(currentCell)) return;

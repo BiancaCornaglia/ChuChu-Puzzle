@@ -5,7 +5,7 @@ using UnityEngine.Tilemaps;
 public class GridMovement : MonoBehaviour
 {
     [Header("Tilemap de movimiento")]
-    [SerializeField] private Tilemap tilemap;       // Tilemap de suelo (movible)
+    [SerializeField] private Tilemap tilemap; // Tilemap de suelo movible
 
     [Header("Movimiento")]
     [SerializeField] private float moveTime = 0.15f;
@@ -16,7 +16,6 @@ public class GridMovement : MonoBehaviour
 
     void Start()
     {
-        // Alineamos la posición del objeto al centro de la celda
         currentCell = tilemap.WorldToCell(transform.position);
         currentCell = tilemap.WorldToCell(tilemap.GetCellCenterWorld(currentCell));
         transform.position = tilemap.GetCellCenterWorld(currentCell);
@@ -26,14 +25,14 @@ public class GridMovement : MonoBehaviour
     void Update()
     {
         if (isMoving) return;
+        if (GameManager.Instance.IsPaused) return; // 🔥 ¡Importante! No moverse si está pausado
 
-        Vector3Int direction = GetInputDirection();
+        Vector3Int direction = InputManager.GetMovementInput();
 
         if (direction != Vector3Int.zero)
         {
             Vector3Int newCell = currentCell + direction;
 
-            // Solo se mueve si el nuevo tile existe en el tilemap de movimiento
             if (tilemap.HasTile(newCell))
             {
                 currentCell = newCell;
@@ -41,15 +40,6 @@ public class GridMovement : MonoBehaviour
                 StartCoroutine(Move());
             }
         }
-    }
-
-    private Vector3Int GetInputDirection()
-    {
-        if (Input.GetKeyDown(KeyCode.RightArrow)) return Vector3Int.right;
-        if (Input.GetKeyDown(KeyCode.LeftArrow)) return Vector3Int.left;
-        if (Input.GetKeyDown(KeyCode.UpArrow)) return Vector3Int.up;
-        if (Input.GetKeyDown(KeyCode.DownArrow)) return Vector3Int.down;
-        return Vector3Int.zero;
     }
 
     IEnumerator Move()
